@@ -5,7 +5,7 @@ class LedController:
     def __init__(self, num_leds):
         self.num_leds = num_leds
         self.leds = [Led([0, 0, 0]) for _ in range(num_leds)]  # Inicializa los LEDs en negro
-        self.serial_port = serial.Serial('COM3', 250000)  # Cambia 'COM_PORT' por el puerto correcto
+        self.serial_port = serial.Serial('COM4', 250000)  # Cambia 'COM_PORT' por el puerto correcto
 
     def wheel(self, wheel_pos):
         wheel_pos = 255 - wheel_pos

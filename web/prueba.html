@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animación Arcoiris con eel</title>
+    <style>
+        body {
+            background-color: #121212;
+            /* Modo oscuro */
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        #circle {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 5px solid black;
+            /* Línea fija, gruesa y negra */
+            margin: 50px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .led {
+            position: absolute;
+            width: 30px;
+            /* Tamaño de los cuadrados */
+            height: 30px;
+            background-color: red;
+            /* Color por defecto */
+            transform-origin: center;
+            transition: all 0.1s ease;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="circle"></div>
+
+    <div class="buttons">
+        <button onclick="addSquare()">Añadir cuadrado</button>
+        <button onclick="removeSquare()">Eliminar cuadrado</button>
+    </div>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <script type="text/javascript">
+        let numLeds = 8; // Número inicial de LEDs
+        const circle = document.getElementById('circle');
+
+        // Función para crear el efecto de los cuadrados en el círculo
+        function updateCircle(data) {
+            // Limpiar los cuadrados previos
+            circle.innerHTML = '';
+
+            // Obtener el número de LEDs y los colores
+            numLeds = data.numLeds;
+            const leds = data.leds;
+
+            // Calcular el ángulo entre cada cuadrado
+            const angleStep = 360 / numLeds;
+
+            // El radio del círculo (ajustar si deseas que el círculo sea más grande o pequeño)
+            const radius = 120;
+            const squareSize = 30; // Tamaño de los cuadrados
+
+            // Crear los cuadrados en la posición correcta
+            leds.forEach((led, index) => {
+                const square = document.createElement('div');
+                square.classList.add('led');
+
+                // Asignar el color del cuadrado
+                square.style.backgroundColor = `rgb(${led.r}, ${led.g}, ${led.b})`;
+
+                // Calcular el ángulo en radianes
+                const angle = angleStep * index;
+                const angleInRadians = (angle * Math.PI) / 180;
+
+                // Calcular las coordenadas X y Y para el cuadrado
+                // Ajustar la posición para asegurar que el cuadrado se ubique correctamente en el borde del círculo
+                const x = circle.offsetWidth / 2 + (radius - squareSize / 2) * Math.cos(angleInRadians);
+                const y = circle.offsetHeight / 2 + (radius - squareSize / 2) * Math.sin(angleInRadians);
+
+                // Posicionar el cuadrado
+                square.style.left = `${x - squareSize / 2}px`; // Centrar el cuadrado
+                square.style.top = `${y - squareSize / 2}px`; // Centrar el cuadrado
+
+                // Apuntar un lado de cada cuadrado hacia el centro del círculo
+                square.style.transform = `rotate(${angle}deg)`;
+
+                // Añadir el cuadrado al círculo
+                circle.appendChild(square);
+            });
+
+        }
+
+
+        // Exponer la función para manejar los datos desde Python (usando eel)
+        eel.expose(handleData);
+
+        // Función para recibir los datos desde Python
+        function handleData(jsonData) {
+            const data = JSON.parse(jsonData);
+            updateCircle(data);
+        }
+
+        // Función para añadir un cuadrado
+        function addSquare() {
+            numLeds++;
+            eel.addSquare(numLeds);
+        }
+
+        // Función para eliminar un cuadrado
+        function removeSquare() {
+            if (numLeds > 1) {
+                numLeds--;
+                eel.removeSquare(numLeds);
+            }
+        }
+
+        // Llamar a Python para empezar la simulación
+        eel.start_simulation();
+    </script>
+
+</body>
+
+</html>

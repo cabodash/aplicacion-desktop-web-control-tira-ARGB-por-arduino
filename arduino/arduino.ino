@@ -1,7 +1,7 @@
 #include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
 
-const int PIN = A0; // Pin donde está conectada la tira LED
+const int PIN = 2; // Pin donde está conectada la tira LED
 const int MAX_LEDS = 10; // Número máximo de LEDs
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(MAX_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
